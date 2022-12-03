@@ -25,6 +25,7 @@ namespace Photon.Realtime.Demo
             this.lbc = new LoadBalancingClient();
             this.lbc.AddCallbackTarget(this);
             appSettings.AppIdRealtime = "cf58cf02-3a7c-4c69-92ff-55d2ba4efa4c";
+
             if (!this.lbc.ConnectUsingSettings(appSettings))
             {
                 Debug.LogError("Error while connecting");

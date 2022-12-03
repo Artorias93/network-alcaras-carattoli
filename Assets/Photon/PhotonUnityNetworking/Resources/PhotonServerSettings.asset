@@ -15,12 +15,12 @@ MonoBehaviour:
   AppSettings:
     AppIdRealtime: cf58cf02-3a7c-4c69-92ff-55d2ba4efa4c
     AppIdFusion: 
-    AppIdChat: 
+    AppIdChat: eeb60e2d-d330-498e-8b61-48268f2a9666
     AppIdVoice: 
     AppVersion: 
     UseNameServer: 1
     FixedRegion: 
-    Server: 127.0.0.1
+    Server: 
     Port: 5058
     ProxyServer: 
     Protocol: 0
