@@ -20,14 +20,14 @@ public class CubesManager : MonoBehaviour, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             cube.GetComponent<Rigidbody>().AddForce(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * Time.deltaTime * force);
-            cubeAround.RotateAround(cube.position, Vector3.up, rotateSpeed * Time.deltaTime);
+           // cubeAround.RotateAround(cube.position, Vector3.up, rotateSpeed * Time.deltaTime);
         }
         else 
         {
             cube.position = cube.position + 0.9f *(cubeNetworkPosition - cube.position);
             cube.rotation = Quaternion.Slerp(cube.rotation, cubeNetworkRotation, 0.9f);
-            cubeAround.position = cubeAround.position + 0.9f * (cubeAroundNetworkPosition - cubeAround.position);
-            cubeAround.rotation = Quaternion.Slerp(cubeAround.rotation, cubeAroundNetworkRotation, 0.9f);
+            //cubeAround.position = cubeAround.position + 0.9f * (cubeAroundNetworkPosition - cubeAround.position);
+            //cubeAround.rotation = Quaternion.Slerp(cubeAround.rotation, cubeAroundNetworkRotation, 0.9f);
         }
     }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -36,15 +36,15 @@ public class CubesManager : MonoBehaviour, IPunObservable
         {
             stream.SendNext(cube.position);
             stream.SendNext(cube.rotation);
-            stream.SendNext(cubeAround.position);
-            stream.SendNext(cubeAround.rotation);
+            //stream.SendNext(cubeAround.position);
+            //stream.SendNext(cubeAround.rotation);
         }
         else
         {
             cubeNetworkPosition = (Vector3)stream.ReceiveNext();
             cubeNetworkRotation = (Quaternion)stream.ReceiveNext();
-            cubeAroundNetworkPosition = (Vector3)stream.ReceiveNext();
-            cubeAroundNetworkRotation = (Quaternion)stream.ReceiveNext();
+            //cubeAroundNetworkPosition = (Vector3)stream.ReceiveNext();
+            //cubeAroundNetworkRotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }
