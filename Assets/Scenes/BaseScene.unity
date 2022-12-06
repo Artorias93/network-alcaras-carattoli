@@ -279,7 +279,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cube: {fileID: 790411835}
-  cubeAround: {fileID: 985605190}
+  cubesList:
+  - {fileID: 985605190}
   force: 2000
   rotateSpeed: 200
 --- !u!114 &601574043
