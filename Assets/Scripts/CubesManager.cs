@@ -22,28 +22,47 @@ public class CubesManager : MonoBehaviour, IPunObservable
         }
     }
 
-    [SerializeField] private Transform cube;
+    [SerializeField] private GameObject cube;
     [SerializeField] private List<Transform> cubesList;
-    [SerializeField] private float force = 2000;
+    [SerializeField] private float moveForce = 2000;
+    [SerializeField] private float jumpForce = 200;
     [SerializeField] private float rotateSpeed = 200;
+    
     public Dictionary<int,CubeState> cubesDict = new Dictionary<int, CubeState>();
     public Dictionary<int, CubeState> networkCubesDict = new Dictionary<int, CubeState>();
+
+    private CubeController cubeController;
+    private Vector3 moveVector;
+    private Rigidbody rb;
 
     private readonly Dictionary<int, Transform> interactables= new Dictionary<int, Transform>();
 
     void Start()
     {
-        for (int i = 0; i < cubesList.Count; i++) {
+        cubeController = cube.GetComponent<CubeController>();
+        rb = cube.GetComponent<Rigidbody>();
+
+        for (int i = 0; i < cubesList.Count; i++)
+        {
             interactables.Add(i, cubesList[i]);
         }
-        interactables.Add(interactables.Count, cube);
-    }
 
+        interactables.Add(interactables.Count, cube.transform);
+    }
+    
     private void Update()
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            cube.GetComponent<Rigidbody>().AddForce(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * Time.deltaTime * force);
+            moveVector.x = Input.GetAxis("Horizontal");
+            moveVector.z = Input.GetAxis("Vertical");
+            rb.AddForce(moveVector * Time.deltaTime * moveForce);
+            print(cubeController.CanJump() + " 2");
+
+            if (cubeController.CanJump())
+            {
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            }
         }
         else 
         {
@@ -58,6 +77,7 @@ public class CubesManager : MonoBehaviour, IPunObservable
             //cube.rotation = Quaternion.Slerp(cube.rotation, cubeNetworkRotation, 0.9f);
         }
     }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         int[] keys = new int[interactables.Count];
@@ -79,7 +99,6 @@ public class CubesManager : MonoBehaviour, IPunObservable
         }
         else
         {
-
             keys = (int[]) stream.ReceiveNext();
             positions = (Vector3[])stream.ReceiveNext();
             rotations = (Quaternion[])stream.ReceiveNext();
