@@ -23,10 +23,10 @@ public class CubesManager : MonoBehaviour, IPunObservable
     }
 
     [SerializeField] private GameObject cube;
+    [SerializeField] private GameObject cubesContainer;
     [SerializeField] private List<Transform> cubesList;
     [SerializeField] private float moveForce = 2000;
-    [SerializeField] private float jumpForce = 200;
-    [SerializeField] private float rotateSpeed = 200;
+    [SerializeField] private float jumpForce = 20;
     
     public Dictionary<int,CubeState> cubesDict = new Dictionary<int, CubeState>();
     public Dictionary<int, CubeState> networkCubesDict = new Dictionary<int, CubeState>();
@@ -42,9 +42,10 @@ public class CubesManager : MonoBehaviour, IPunObservable
         cubeController = cube.GetComponent<CubeController>();
         rb = cube.GetComponent<Rigidbody>();
 
-        for (int i = 0; i < cubesList.Count; i++)
+        for (int i = 0; i < cubesContainer.transform.childCount; i++)
         {
-            interactables.Add(i, cubesList[i]);
+            cubesList.Add(cubesContainer.transform.GetChild(i));
+            interactables.Add(i, cubesContainer.transform.GetChild(i));
         }
 
         interactables.Add(interactables.Count, cube.transform);
@@ -57,7 +58,6 @@ public class CubesManager : MonoBehaviour, IPunObservable
             moveVector.x = Input.GetAxis("Horizontal");
             moveVector.z = Input.GetAxis("Vertical");
             rb.AddForce(moveVector * Time.deltaTime * moveForce);
-            print(cubeController.CanJump() + " 2");
 
             if (cubeController.CanJump())
             {
