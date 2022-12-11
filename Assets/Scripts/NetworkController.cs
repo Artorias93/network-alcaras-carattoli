@@ -10,7 +10,8 @@ public class NetworkController : MonoBehaviourPunCallbacks
 
     public void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();   
+        PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.SerializationRate=10;
     }
 
     public override void OnConnectedToMaster()

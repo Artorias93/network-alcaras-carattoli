@@ -70,11 +70,11 @@ public class CubesManager : MonoBehaviour, IPunObservable
             {
                 Vector3 networkPosition = item.Value.position;
                 Quaternion networkRotation = item.Value.rotation;
-                interactables[item.Key].position = networkPosition;
-                interactables[item.Key].rotation = networkRotation;
+                float distance = Vector3.Distance(interactables[item.Key].position, networkPosition);
+                float angle = Quaternion.Angle(interactables[item.Key].rotation, networkRotation);
+                interactables[item.Key].position = Vector3.MoveTowards(interactables[item.Key].position, networkPosition, distance * Time.deltaTime * PhotonNetwork.SerializationRate);
+                interactables[item.Key].rotation = Quaternion.RotateTowards(interactables[item.Key].rotation, networkRotation, angle * Time.deltaTime * PhotonNetwork.SerializationRate);
             }
-            //cube.position = cube.position + 0.9f *(cubeNetworkPosition - cube.position);
-            //cube.rotation = Quaternion.Slerp(cube.rotation, cubeNetworkRotation, 0.9f);
         }
     }
 

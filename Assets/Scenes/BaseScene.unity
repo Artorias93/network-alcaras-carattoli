@@ -7235,7 +7235,7 @@ MonoBehaviour:
   cube: {fileID: 790411829}
   cubesContainer: {fileID: 953069326}
   cubesList: []
-  moveForce: 2000
+  moveForce: 1000
   jumpForce: 5
 --- !u!114 &601574043
 MonoBehaviour:
