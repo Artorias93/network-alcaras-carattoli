@@ -25,22 +25,16 @@ public class CubesManager : MonoBehaviour, IPunObservable
     [SerializeField] private GameObject cube;
     [SerializeField] private GameObject cubesContainer;
     [SerializeField] private List<Transform> cubesList;
-    [SerializeField] private float moveForce = 2000;
-    [SerializeField] private float jumpForce = 20;
+
     
     public Dictionary<int,CubeState> cubesDict = new Dictionary<int, CubeState>();
     public Dictionary<int, CubeState> networkCubesDict = new Dictionary<int, CubeState>();
 
-    private CubeController cubeController;
-    private Vector3 moveVector;
-    private Rigidbody rb;
 
     private readonly Dictionary<int, Transform> interactables= new Dictionary<int, Transform>();
 
     void Start()
     {
-        cubeController = cube.GetComponent<CubeController>();
-        rb = cube.GetComponent<Rigidbody>();
 
         for (int i = 0; i < cubesContainer.transform.childCount; i++)
         {
@@ -53,18 +47,7 @@ public class CubesManager : MonoBehaviour, IPunObservable
     
     private void Update()
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            moveVector.x = Input.GetAxis("Horizontal");
-            moveVector.z = Input.GetAxis("Vertical");
-            rb.AddForce(moveVector * Time.deltaTime * moveForce);
-
-            if (cubeController.CanJump())
-            {
-                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            }
-        }
-        else 
+        if (!PhotonNetwork.IsMasterClient)
         {
             foreach (var item in networkCubesDict)
             {
