@@ -5,15 +5,14 @@ using Photon.Pun;
 
 public class CubeController : MonoBehaviour
 {
-    [SerializeField] private float repulsiveRadius = 5.0f;
-    [SerializeField] private float repulsiveForce = 10.0f;
-    [SerializeField] private float upwardsModifier = 3.0f;
-    [SerializeField] private float moveForce = 2000;
-    [SerializeField] private float jumpForce = 20;
+    [SerializeField] private float repulsiveRadius = 6.0f;
+    [SerializeField] private float repulsiveForce = 80.0f;
+    [SerializeField] private float moveForce = 700;
+    [SerializeField] private float flaotingPosition=4.0f;
+    [SerializeField] private float floatStrenght=700.0f;
 
-    private bool b_isGrounded = true;
-    private bool b_canExplode = false;
     private Vector3 moveVector;
+    private bool floating;
     private Rigidbody rb;
 
     // Start is called before the first frame update
@@ -23,50 +22,79 @@ public class CubeController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    { 
-        if (PhotonNetwork.IsMasterClient) {
+    void FixedUpdate()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
             moveVector.x = Input.GetAxis("Horizontal");
             moveVector.z = Input.GetAxis("Vertical");
-            rb.AddForce(moveForce * Time.deltaTime * moveVector);
-            if (b_isGrounded)
+            rb.AddForce(moveForce * Time.fixedDeltaTime * moveVector);
+
+            if (Input.GetButton("Jump"))
             {
-                if (Input.GetButton("Jump"))
+                rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                if (transform.position.y < flaotingPosition)
                 {
-                    b_isGrounded = false;
-                   
-                    rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                    Vector3 explosionPos = transform.position;
-                    Collider[] colliders = Physics.OverlapSphere(explosionPos, repulsiveRadius);
-                    foreach (Collider hit in colliders)
+                    rb.AddForce(Vector3.up * floatStrenght * Time.fixedDeltaTime);
+                }
+
+                Collider[] colliders = Physics.OverlapSphere(transform.position, repulsiveRadius);
+                foreach (Collider hit in colliders)
+                {
+                    if (hit.CompareTag("Prop"))
                     {
-                        if (hit.CompareTag("Player") || hit.CompareTag("Floor")) b_canExplode = false;
-                        else b_canExplode = true;
-
-                       // Rigidbody rb = hit.GetComponent<Rigidbody>();
-
-                        if (b_canExplode)
+                        if (hit.GetComponent<Rigidbody>() == null)
                         {
-                            foreach (Transform child in transform)
-                            {
-                                child.gameObject.AddComponent<Rigidbody>();
-                                child.transform.parent = null;
-                            }
-                            rb.AddExplosionForce(repulsiveForce, explosionPos, repulsiveRadius, upwardsModifier, ForceMode.Impulse);
+                            hit.gameObject.AddComponent<Rigidbody>();
+                            hit.transform.parent = null;
                         }
+                        Vector3 dir = transform.position - hit.transform.position;
+                        hit.GetComponent<Rigidbody>().AddForce(-repulsiveForce * dir.normalized, ForceMode.Force);
+
+
                     }
+
                 }
             }
+            else {
+
+                //Collider[] colliders = Physics.OverlapSphere(transform.position, repulsiveRadius);
+                //foreach (Collider hit in colliders)
+                //{
+                //    if (hit.CompareTag("Prop"))
+                //    {
+                //        //if (hit.GetComponent<Rigidbody>() == null)
+                //        //{
+                //        //    hit.gameObject.AddComponent<Rigidbody>();
+                //        //    hit.transform.parent = null;
+                //        //}
+                //        Vector3 dir = transform.position - hit.transform.position;
+                //        hit.GetComponent<Rigidbody>().AddForce(15* dir.normalized, ForceMode.Force);
+                //    }
+
+                //}
+            }
+            if (Input.GetButtonUp("Jump"))
+            {
+                rb.constraints = RigidbodyConstraints.None;
+            }
+
         }
-       
+
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        b_isGrounded = true;
-        if (!collision.gameObject.CompareTag("Floor")) {
-            collision.transform.parent = transform;
-            Destroy(collision.gameObject.GetComponent<Rigidbody>());
+        if (collision.gameObject.CompareTag("Prop"))
+        {
+            for (int i = 0; i < collision.contactCount; i++) {
+                if (collision.GetContact(i).thisCollider.transform == transform)
+                {
+                    Collider contactCollider = collision.GetContact(i).otherCollider;
+                    contactCollider.transform.parent = transform;
+                    Destroy(contactCollider.gameObject.GetComponent<Rigidbody>());
+                }
+            }
         }
     }
 }
