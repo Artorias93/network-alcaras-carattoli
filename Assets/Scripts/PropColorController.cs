@@ -6,36 +6,58 @@ public class PropColorController : MonoBehaviour
 {
     public bool interacting = false;
     private Coroutine coroutine=null;
-    private Renderer render;
+    private Coroutine colorCoroutine = null;
+    private Renderer renderer;
 
     void Start()
     {
-        render = GetComponent<Renderer>();
+        renderer = GetComponent<Renderer>();
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator resetInteracting() 
     {
-        if (interacting)
-        {
-            render.material.color = Color.red;
-        }
-        else {
-            render.material.color = Color.gray;
-        }
-        
-    }
-
-    IEnumerator resetInteracting() {
         yield return new WaitForSeconds(1);
         interacting = false;
+        if (colorCoroutine != null)
+        {
+            StopCoroutine(colorCoroutine);
+        }
+        colorCoroutine = StartCoroutine("FadeG2R");
+    }
+
+    IEnumerator FadeR2G()
+    {
+        for (float alpha = 1f; alpha >= 0; alpha -= 0.1f)
+        {
+            renderer.material.color = Color.Lerp(Color.red, Color.gray, alpha);
+            yield return new WaitForSeconds(.1f);
+        }
+    }
+
+    IEnumerator FadeG2R()
+    {
+        for (float alpha = 1f; alpha >= 0; alpha -= 0.1f)
+        {
+            renderer.material.color = Color.Lerp(Color.gray, Color.red, alpha);
+            yield return new WaitForSeconds(.1f);
+        }
     }
 
     public void interact() {
+        
+        if (!interacting) 
+        {
+            if (colorCoroutine != null)
+            {
+                StopCoroutine(colorCoroutine);
+            }
+            colorCoroutine = StartCoroutine("FadeR2G");
+        }
+        
         interacting = true;
         if (coroutine != null)
         {
-            StopCoroutine("resetInteracting");
+            StopCoroutine(coroutine);
         }
         coroutine = StartCoroutine("resetInteracting");
     }

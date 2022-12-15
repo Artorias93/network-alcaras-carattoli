@@ -13,9 +13,11 @@ public class CubeController : MonoBehaviour
     [SerializeField] private float attractiveForce=4f;
     [SerializeField] private float attractiveRadius = 4.0f;
 
-
+    private bool floatButtonPressed;
     private Vector3 moveVector;
     private Rigidbody rb;
+
+    private Collider[] colliders;
 
     // Start is called before the first frame update
     void Start()
@@ -23,24 +25,44 @@ public class CubeController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
+    private void Update()
+    {
+        moveVector.x = Input.GetAxis("Horizontal");
+        moveVector.z = Input.GetAxis("Vertical");
+
+        if (Input.GetButton("Jump"))
+        {
+            floatButtonPressed = true;
+            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            colliders = Physics.OverlapSphere(transform.position, repulsiveRadius);
+        }
+        else
+        { 
+            colliders = Physics.OverlapSphere(transform.position, attractiveRadius); 
+        }
+
+        if (Input.GetButtonUp("Jump"))
+        {
+            floatButtonPressed = false;
+            rb.constraints = RigidbodyConstraints.None;
+        }
+
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            moveVector.x = Input.GetAxis("Horizontal");
-            moveVector.z = Input.GetAxis("Vertical");
             rb.AddForce(moveForce * Time.fixedDeltaTime * moveVector);
 
-            if (Input.GetButton("Jump"))
+            if (floatButtonPressed)
             {
-                rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
                 if (transform.position.y < flaotingPosition)
                 {
                     rb.AddForce(Vector3.up * floatStrenght * Time.fixedDeltaTime);
                 }
 
-                Collider[] colliders = Physics.OverlapSphere(transform.position, repulsiveRadius);
                 foreach (Collider hit in colliders)
                 {
                     if (hit.CompareTag("Prop"))
@@ -54,7 +76,6 @@ public class CubeController : MonoBehaviour
             }
             else {
 
-                Collider[] colliders = Physics.OverlapSphere(transform.position, attractiveRadius);
                 foreach (Collider hit in colliders)
                 {
                     if (hit.CompareTag("Prop"))
@@ -65,10 +86,6 @@ public class CubeController : MonoBehaviour
                     }
 
                 }
-            }
-            if (Input.GetButtonUp("Jump"))
-            {
-                rb.constraints = RigidbodyConstraints.None;
             }
 
         }
