@@ -15,7 +15,6 @@ public class CubeController : MonoBehaviour
 
 
     private Vector3 moveVector;
-    private bool floating;
     private Rigidbody rb;
 
     // Start is called before the first frame update
@@ -46,15 +45,9 @@ public class CubeController : MonoBehaviour
                 {
                     if (hit.CompareTag("Prop"))
                     {
-                        //if (hit.GetComponent<Rigidbody>() == null)
-                        //{
-                        //    hit.gameObject.AddComponent<Rigidbody>();
-                        //    hit.transform.parent = null;
-                        //}
                         Vector3 dir = transform.position - hit.transform.position;
+                        hit.GetComponent<PropColorController>().interact();
                         hit.GetComponent<Rigidbody>().AddForce(-repulsiveForce * dir.normalized, ForceMode.Force);
-
-
                     }
 
                 }
@@ -66,15 +59,9 @@ public class CubeController : MonoBehaviour
                 {
                     if (hit.CompareTag("Prop"))
                     {
-                        //if (hit.GetComponent<Rigidbody>() == null)
-                        //{
-                        //    hit.gameObject.AddComponent<Rigidbody>();
-                        //    hit.transform.parent = null;
-                        //}
                         Vector3 dir = transform.position - hit.transform.position;
+                        hit.GetComponent<PropColorController>().interact();
                         hit.GetComponent<Rigidbody>().AddForce(attractiveForce*dir.normalized*Time.fixedDeltaTime, ForceMode.Force);
-
-                        // hit.transform.position = Vector3.MoveTowards(hit.transform.position, transform.position, attractiveForce*Time.fixedDeltaTime);
                     }
 
                 }
@@ -87,19 +74,5 @@ public class CubeController : MonoBehaviour
         }
 
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        //if (collision.gameObject.CompareTag("Prop"))
-        //{
-        //    for (int i = 0; i < collision.contactCount; i++) {
-        //        if (collision.GetContact(i).thisCollider.transform == transform)
-        //        {
-        //            Collider contactCollider = collision.GetContact(i).otherCollider;
-        //            contactCollider.transform.parent = transform;
-        //            Destroy(contactCollider.gameObject.GetComponent<Rigidbody>());
-        //        }
-        //    }
-        //}
-    }
 }
+
