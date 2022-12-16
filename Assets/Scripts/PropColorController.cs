@@ -8,12 +8,27 @@ public class PropColorController : MonoBehaviour
     private Coroutine coroutine=null;
     private Coroutine colorCoroutine = null;
     private Renderer renderer;
+    private Vector3 oldPos=Vector3.zero;
+    private Quaternion oldRot = Quaternion.identity;
 
     void Start()
     {
         renderer = GetComponent<Renderer>();
     }
 
+    private void Update()
+    {
+        if (oldPos != transform.position || oldRot != transform.rotation)
+        {
+            oldPos = transform.position;
+            oldRot = transform.rotation;
+            interacting = true;
+        }
+        else {
+            interacting = false;
+        }
+        interact();
+    }
     IEnumerator resetInteracting() 
     {
         yield return new WaitForSeconds(1);
