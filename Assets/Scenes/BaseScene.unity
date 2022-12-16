@@ -41485,13 +41485,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c90d46b95c22b459ecaef174ffb340, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  repulsiveRadius: 6
-  repulsiveForce: 2
+  repulsiveRadius: 4
+  repulsiveForce: 0.8
   moveForce: 700
   flaotingPosition: 4
   floatStrenght: 700
-  attractiveForce: 4
-  attractiveRadius: 4
+  attractiveForce: 5
+  attractiveRadius: 3
 --- !u!1 &791163688
 GameObject:
   m_ObjectHideFlags: 0

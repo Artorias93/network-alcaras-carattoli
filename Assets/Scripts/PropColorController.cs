@@ -8,20 +8,24 @@ public class PropColorController : MonoBehaviour
     private Coroutine coroutine=null;
     private Coroutine colorCoroutine = null;
     private Renderer renderer;
+    private Rigidbody rb;
     private Vector3 oldPos=Vector3.zero;
     private Quaternion oldRot = Quaternion.identity;
-
+    private Vector3 oldVel = Vector3.zero;
     void Start()
     {
         renderer = GetComponent<Renderer>();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
-    {
-        if (oldPos != transform.position || oldRot != transform.rotation)
+    {   
+        
+        if (oldPos != transform.position || oldRot != transform.rotation || oldVel != rb.angularVelocity)
         {
             oldPos = transform.position;
             oldRot = transform.rotation;
+            oldVel = rb.angularVelocity;
             interacting = true;
         }
         else {
@@ -75,5 +79,19 @@ public class PropColorController : MonoBehaviour
             StopCoroutine(coroutine);
         }
         coroutine = StartCoroutine("resetInteracting");
+    }
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.transform.CompareTag("Player")) {
+            interacting = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.transform.CompareTag("Player"))
+        {
+            interacting = false;
+        }
     }
 }
