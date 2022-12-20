@@ -35,10 +35,9 @@ public class NetworkController : MonoBehaviourPunCallbacks
             for (int i = 0; i < cubesContainer.transform.childCount; i++)
             {
                 Transform item = cubesContainer.transform.GetChild(i);
-                //Destroy(item.GetComponent<Rigidbody>());
                 item.GetComponent<Rigidbody>().isKinematic = true;
             }
-            //Destroy(cubesManager.cube.GetComponent<Rigidbody>());
+
             cubesManager.cube.GetComponent<Rigidbody>().isKinematic = true;
 
         }
