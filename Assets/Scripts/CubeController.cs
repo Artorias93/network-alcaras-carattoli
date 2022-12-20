@@ -68,7 +68,7 @@ public class CubeController : MonoBehaviour
                     if (hit.CompareTag("Prop"))
                     {
                         Vector3 dir = transform.position - hit.transform.position;
-                        //hit.GetComponent<PropColorController>().interact();
+                        hit.GetComponent<PropColorController>().interact();
                         hit.GetComponent<Rigidbody>().AddForce(-repulsiveForce * dir.normalized, ForceMode.Force);
                     }
 
@@ -81,7 +81,7 @@ public class CubeController : MonoBehaviour
                     if (hit.CompareTag("Prop"))
                     {
                         Vector3 dir = transform.position - hit.transform.position;
-                        //hit.GetComponent<PropColorController>().interact();
+                        hit.GetComponent<PropColorController>().interact();
                         hit.GetComponent<Rigidbody>().AddForce(attractiveForce*dir.normalized*Time.fixedDeltaTime, ForceMode.Force);
                     }
 

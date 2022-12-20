@@ -6,8 +6,9 @@ using Photon.Realtime;
 
 public class NetworkController : MonoBehaviourPunCallbacks
 {
- 
-
+    public bool isMaster =false;
+    [SerializeField] private CubesManager cubesManager;
+    
     public void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
@@ -21,5 +22,23 @@ public class NetworkController : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinOrCreateRoom("Test", roomOptions, TypedLobby.Default);
     }
 
-  
+    public override void OnCreatedRoom()
+    {
+        base.OnCreatedRoom();
+        isMaster = true;
+    }
+    public override void OnJoinedRoom()
+    {
+        base.OnJoinedRoom();
+        if (!isMaster) {
+            GameObject cubesContainer = cubesManager.cubesContainer;
+            for (int i = 0; i < cubesContainer.transform.childCount; i++)
+            {
+                Transform item = cubesContainer.transform.GetChild(i);
+                Destroy(item.GetComponent<Rigidbody>());
+            }
+            Destroy(cubesManager.cube.GetComponent<Rigidbody>());
+        }
+
+    }
 }

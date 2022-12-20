@@ -22,12 +22,12 @@ public class CubesManager : MonoBehaviour, IPunObservable
         }
     }
 
-    [SerializeField] private GameObject cube;
-    [SerializeField] private GameObject cubesContainer;
+    [SerializeField] public GameObject cube;
+    [SerializeField] public GameObject cubesContainer;
     [SerializeField] private List<Transform> cubesList;
+    [SerializeField] private NetworkController network;
 
     
-    public Dictionary<int,CubeState> cubesDict = new Dictionary<int, CubeState>();
     public Dictionary<int, CubeState> networkCubesDict = new Dictionary<int, CubeState>();
 
 
@@ -38,16 +38,18 @@ public class CubesManager : MonoBehaviour, IPunObservable
 
         for (int i = 0; i < cubesContainer.transform.childCount; i++)
         {
-            cubesList.Add(cubesContainer.transform.GetChild(i));
-            interactables.Add(i, cubesContainer.transform.GetChild(i));
+            Transform item = cubesContainer.transform.GetChild(i);
+            cubesList.Add(item);
+            interactables.Add(i, item);
         }
 
         interactables.Add(interactables.Count, cube.transform);
+
     }
     
     private void Update()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!network.isMaster)
         {
             foreach (var item in networkCubesDict)
             {
@@ -55,45 +57,49 @@ public class CubesManager : MonoBehaviour, IPunObservable
                 Quaternion networkRotation = item.Value.rotation;
                 float distance = Vector3.Distance(interactables[item.Key].position, networkPosition);
                 float angle = Quaternion.Angle(interactables[item.Key].rotation, networkRotation);
+
                 interactables[item.Key].position = Vector3.MoveTowards(interactables[item.Key].position, networkPosition, distance * Time.deltaTime * PhotonNetwork.SerializationRate);
                 interactables[item.Key].rotation = Quaternion.RotateTowards(interactables[item.Key].rotation, networkRotation, angle * Time.deltaTime * PhotonNetwork.SerializationRate);
+                PropColorController controller = interactables[item.Key].GetComponent<PropColorController>();
+                if (controller != null) {
+                    controller.interact();
+                }
             }
         }
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        int[] keys = new int[interactables.Count];
-        Vector3[] positions = new Vector3[interactables.Count];
-        Quaternion[] rotations = new Quaternion[interactables.Count];
+
 
         if (stream.IsWriting)
         {
+            List<int> keys = new List<int>();
+            List<Vector3> positions = new List<Vector3>();
+            List<Quaternion> rotations = new List<Quaternion>();
             foreach (var item in interactables)
             {
-                keys[item.Key] = item.Key;
-                positions[item.Key] = item.Value.position;
-                rotations[item.Key] = item.Value.rotation;
+                PropColorController controller =  item.Value.GetComponent<PropColorController>();
+                if (controller == null || controller.interacting)
+                {
+                    keys.Add(item.Key);
+                    positions.Add(item.Value.position);
+                    rotations.Add(item.Value.rotation);
+                }
             }
 
-            stream.SendNext(keys);
-            stream.SendNext(positions);
-            stream.SendNext(rotations);
+            stream.SendNext(keys.ToArray());
+            stream.SendNext(positions.ToArray());
+            stream.SendNext(rotations.ToArray());
         }
         else
-        {
-            keys = (int[]) stream.ReceiveNext();
-            positions = (Vector3[])stream.ReceiveNext();
-            rotations = (Quaternion[])stream.ReceiveNext();
+        {   
+            networkCubesDict = new Dictionary<int, CubeState>();
+            int[] keys = (int[])stream.ReceiveNext();
+            Vector3[] positions = (Vector3[])stream.ReceiveNext();
+            Quaternion[] rotations = (Quaternion[])stream.ReceiveNext();
             for (int i = 0; i < keys.Length; i++) {
-                if (networkCubesDict.ContainsKey(i))
-                {
-                    networkCubesDict[i] = new CubeState(positions[i], rotations[i]);
-                }
-                else
-                {
-                    networkCubesDict.Add(i, new CubeState(positions[i], rotations[i]));
-                }
+                networkCubesDict.Add(keys[i], new CubeState(positions[i], rotations[i]));
             }
         }
     }

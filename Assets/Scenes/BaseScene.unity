@@ -31242,6 +31242,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7749bfa797bfd5244a31e1b4cabe96c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMaster: 0
+  cubesManager: {fileID: 601574042}
 --- !u!114 &601574042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31257,6 +31259,7 @@ MonoBehaviour:
   cube: {fileID: 790411829}
   cubesContainer: {fileID: 953069326}
   cubesList: []
+  network: {fileID: 601574041}
 --- !u!114 &601574043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41486,7 +41489,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   repulsiveRadius: 4
-  repulsiveForce: 0.8
+  repulsiveForce: 0.9
   moveForce: 700
   flaotingPosition: 4
   floatStrenght: 700
